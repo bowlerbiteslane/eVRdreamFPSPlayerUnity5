@@ -5,7 +5,6 @@ public class GunBehaviour : WeaponBehaviour {
 
     public float gunFlashLength = 0.1f;
 
-
     private AudioSource gunshotAudio = null;
     private bool pointLightOn;
     private float timeCnt;

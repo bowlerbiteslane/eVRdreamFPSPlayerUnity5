@@ -6,6 +6,8 @@ public class PlayerShooting : MonoBehaviour {
 
     private WeaponManager weaponManager = null;
 
+    public float shotOffsetModifer = 0.05f;
+
     public GameObject bulletImpactGeneric = null;
     public GameObject bulletImpactWood = null;
     public GameObject bulletImpactConcrete = null;
@@ -46,19 +48,28 @@ public class PlayerShooting : MonoBehaviour {
 	// Update is called once per frame
 	void FixedUpdate () 
     {
+       
         if(SCRIPTDEBUG)
             ScriptDebug();
         // on player fire
         if (Input.GetButton("Fire1") && Time.time > nextFire)                                                                                                   // check if the player pulls the trigger and the gun is within it's firing rate
-        {
-            nextFire = Time.time + weaponManager.CurrentWeapon.GetComponent<WeaponBehaviour>().FireRate;
-            weaponManager.CurrentWeapon.GetComponent<WeaponBehaviour>().TriggerAttack();
-            RaycastHit rayHit;
-            // on raycast hit
-            if (Physics.Raycast(playerCamera.transform.position, playerCamera.transform.forward, out rayHit, weaponManager.CurrentWeapon.GetComponent<WeaponBehaviour>().WeaponReach, rayLayerMask))                       // check if raycast was successful and get the location of the hit
-            {
-               
+        {   
+            // reset nextFire to gun's current fire rate
+            nextFire = Time.time + weaponManager.CurrentWeaponBehaviour.FireRate;
+            weaponManager.CurrentWeaponBehaviour.TriggerAttack();
 
+            //calculate shot inaccuracy
+            float currentWeaponAccuracy = weaponManager.CurrentWeaponBehaviour.WeaponAccuracy;
+            float shotOffsetX = Random.Range(-shotOffsetModifer, shotOffsetModifer) * (1 - currentWeaponAccuracy);
+            float shotOffsetY = Random.Range(-shotOffsetModifer, shotOffsetModifer) * (1 - currentWeaponAccuracy);
+            //shotOffsetX = .1f;
+            //shotOffsetY = .1f;
+            Vector3 shotOffset = new Vector3(shotOffsetX, shotOffsetY, 0f);
+
+            // send raycast
+            RaycastHit rayHit;
+            if (Physics.Raycast(playerCamera.transform.position, playerCamera.transform.forward + shotOffset, out rayHit, weaponManager.CurrentWeapon.GetComponent<WeaponBehaviour>().WeaponReach, rayLayerMask))                       // check if raycast was successful and get the location of the hit
+            {
                 // increase impact array index
                 impactIndex++;
                 if (impactIndex > impacts.Length - 1) {                                                                                                         // check if impactCnt has reached the max value of the arry
