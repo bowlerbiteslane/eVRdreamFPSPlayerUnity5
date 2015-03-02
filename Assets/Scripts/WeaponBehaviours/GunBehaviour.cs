@@ -21,6 +21,27 @@ public class GunBehaviour : WeaponBehaviour {
     private GameObject pointLight;
 
 
+    public int AmmoInClip
+    {
+        get { return ammoInClip; }
+    }
+
+    public int CurrentClips
+    {
+        get { return currentClips; }
+    }
+
+    public int ClipSize
+    {
+        get { return clipSize; }
+    }
+
+    public int MaxClips
+    {
+        get { return maxClips; }
+    }
+
+
 	// Use this for initialization
 	void Start () {
 
