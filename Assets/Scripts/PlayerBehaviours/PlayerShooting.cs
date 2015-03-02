@@ -17,7 +17,7 @@ public class PlayerShooting : MonoBehaviour {
     public GameObject bulletImpactEnemy = null;
     public int impactCount = 100;
 
-    public LayerMask rayLayerMask = 1 << 8;                 // need to create a layer mask to ensure that the ray does not hit the player - specify here the 
+    public LayerMask rayLayerMask = 1 << 2 << 8;                 // need to create a layer mask to ensure that the ray does not hit the player - specify here the 
     
     public bool SCRIPTDEBUG = true;                         //  creates an additional ray to represent the path of the shoot ray - disable to improve performance
 
@@ -68,7 +68,7 @@ public class PlayerShooting : MonoBehaviour {
 
             // send raycast
             RaycastHit rayHit;
-            if (Physics.Raycast(playerCamera.transform.position, playerCamera.transform.forward + shotOffset, out rayHit, weaponManager.CurrentWeapon.GetComponent<WeaponBehaviour>().WeaponReach, rayLayerMask))                       // check if raycast was successful and get the location of the hit
+            if (Physics.Raycast(playerCamera.transform.position, playerCamera.transform.forward + shotOffset, out rayHit, weaponManager.CurrentWeaponBehaviour.WeaponReach, rayLayerMask))                       // check if raycast was successful and get the location of the hit
             {
                 // increase impact array index
                 impactIndex++;
