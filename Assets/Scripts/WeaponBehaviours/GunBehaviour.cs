@@ -3,14 +3,22 @@ using System.Collections;
 
 public class GunBehaviour : WeaponBehaviour {
 
-    public float gunFlashLength = 0.1f;
+    [SerializeField]
+    private int clipSize = 10;
+    [SerializeField]
+    private int maxClips = 1;
+    [SerializeField]
+    private int currentClips = 1;
+    [SerializeField]
+    private int ammoInClip = 10;
+    [SerializeField]
+    private float gunFlashLength = 0.1f;
 
     private AudioSource gunshotAudio = null;
     private bool pointLightOn;
     private float timeCnt;
 
     private GameObject pointLight;
-
 
 
 	// Use this for initialization
@@ -30,6 +38,7 @@ public class GunBehaviour : WeaponBehaviour {
             Debug.Log("Cannot find reference to AudioSource. Script Disabled");
             this.enabled = false;
         }
+        Debug.Log("Ammo In Clip: " + ammoInClip + " Total Ammo: " + (ammoInClip + clipSize * currentClips));
 
 	}
 	
@@ -46,12 +55,57 @@ public class GunBehaviour : WeaponBehaviour {
 
 	}
 
-
-    public override void TriggerAttack()
+    public void PickUpAmmoClip()
     {
-        pointLightOn = true;
-        pointLight.light.enabled = true;
-        timeCnt = 0f;
-        gunshotAudio.Play();
+        if (currentClips < maxClips)
+        {
+            currentClips++;
+        }
+    }
+
+    public bool Reload()
+    {
+        if (currentClips > 0)
+        {
+            Debug.Log("Reloading...");
+            currentClips--;
+            ammoInClip = clipSize;
+            return true;
+        }
+        Debug.Log("No clips left.");
+        return false;
+    }
+
+
+    public override bool TriggerAttack()
+    {
+        // update Ammo
+        if (ammoInClip > 0)
+        {
+            ammoInClip--;
+            Debug.Log("Ammo In Clip: " + ammoInClip + " Total Ammo: " + (ammoInClip + clipSize * currentClips));
+            // other gun effects
+            pointLightOn = true;
+            pointLight.light.enabled = true;
+            timeCnt = 0f;
+            gunshotAudio.Play();
+            return true;
+        }
+        else
+        {
+            Reload();
+            return false;
+            /*
+            if (Reload())
+            {
+                
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+             */
+        }        
     }
 }

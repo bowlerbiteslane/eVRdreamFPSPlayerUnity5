@@ -56,73 +56,77 @@ public class PlayerShooting : MonoBehaviour {
         {   
             // reset nextFire to gun's current fire rate
             nextFire = Time.time + weaponManager.CurrentWeaponBehaviour.FireRate;
-            weaponManager.CurrentWeaponBehaviour.TriggerAttack();
+            if (weaponManager.CurrentWeaponBehaviour.TriggerAttack()) { 
 
-            //calculate shot inaccuracy
-            float currentWeaponAccuracy = weaponManager.CurrentWeaponBehaviour.WeaponAccuracy;
-            float shotOffsetX = Random.Range(-shotOffsetModifer, shotOffsetModifer) * (1 - currentWeaponAccuracy);
-            float shotOffsetY = Random.Range(-shotOffsetModifer, shotOffsetModifer) * (1 - currentWeaponAccuracy);
-            //shotOffsetX = .1f;
-            //shotOffsetY = .1f;
-            Vector3 shotOffset = new Vector3(shotOffsetX, shotOffsetY, 0f);
+                //calculate shot inaccuracy
+                float currentWeaponAccuracy = weaponManager.CurrentWeaponBehaviour.WeaponAccuracy;
+                float shotOffsetX = Random.Range(-shotOffsetModifer, shotOffsetModifer) * (1 - currentWeaponAccuracy);
+                float shotOffsetY = Random.Range(-shotOffsetModifer, shotOffsetModifer) * (1 - currentWeaponAccuracy);
+                //shotOffsetX = .1f;
+                //shotOffsetY = .1f;
+                Vector3 shotOffset = new Vector3(shotOffsetX, shotOffsetY, 0f);
+            
 
-            // send raycast
-            RaycastHit rayHit;
-            if (Physics.Raycast(playerCamera.transform.position, playerCamera.transform.forward + shotOffset, out rayHit, weaponManager.CurrentWeaponBehaviour.WeaponReach, rayLayerMask))                       // check if raycast was successful and get the location of the hit
-            {
-                // increase impact array index
-                impactIndex++;
-                if (impactIndex > impacts.Length - 1) {                                                                                                         // check if impactCnt has reached the max value of the arry
-                    impactIndex = 0;
-                }
-                if (impacts[impactIndex] != null)
-                {                                                                                                         //  if there is currently an impact in this spot, destroy it
-                    Destroy(impacts[impactIndex]);
-                }
-                                                                                                                          // adding the (rayHit.normal/100) makes it so that the impact will show up over top of the object                                                                    
-                // check for impact material type
-                GameObject spawnImpact;
-
-                switch (rayHit.transform.gameObject.tag){
-                    case "Enemy":
-                        spawnImpact = bulletImpactEnemy;
-                        break;
-                    case "Wood":
-                        spawnImpact = bulletImpactWood;
-                        break;
-                    case "Concrete":
-                        spawnImpact = bulletImpactConcrete;
-                        break;
-                    case "Dirt":
-                        spawnImpact = bulletImpactDirt;
-                        break;
-                    case "Metal":
-                        spawnImpact = bulletImpactMetal;
-                        break;
-                    case "Glass":
-                        spawnImpact = bulletImpactGlass;
-                        break;
-                    default:
-                        spawnImpact = bulletImpactGeneric;
-                        break;
-                }
-
-                if (spawnImpact == null)
-                    spawnImpact = bulletImpactGeneric;
-                Quaternion bulletRotation = Quaternion.FromToRotation(Vector3.up, rayHit.normal);
-                Vector3 bulletPosition = rayHit.point + (rayHit.normal / 100); 
-                    
-                impacts[impactIndex] = Instantiate(spawnImpact, bulletPosition, bulletRotation) as GameObject;
-                impacts[impactIndex].transform.parent = rayHit.transform;                                                                                              // parents the impact decal under the object that it has hit
-                
-
-                // handle action events after creating impact
-                if (rayHit.transform.gameObject.tag == "Enemy")
+                // send raycast
+                RaycastHit rayHit;
+                if (Physics.Raycast(playerCamera.transform.position, playerCamera.transform.forward + shotOffset, out rayHit, weaponManager.CurrentWeaponBehaviour.WeaponReach, rayLayerMask))                       // check if raycast was successful and get the location of the hit
                 {
-                    if (rayHit.transform.gameObject.GetComponent<HealthManager>() != null)
-                        rayHit.transform.gameObject.GetComponent<HealthManager>().TakeDamage(weaponManager.CurrentWeapon.GetComponent<WeaponBehaviour>().WeaponDamage);
-                    else
-                        Debug.Log("Game Object: " + rayHit.transform.gameObject + " is tagged enemy, but does not have a HealthManager Script");
+                    // increase impact array index
+                    impactIndex++;
+                    if (impactIndex > impacts.Length - 1)
+                    {                                                                                                         // check if impactCnt has reached the max value of the arry
+                        impactIndex = 0;
+                    }
+                    if (impacts[impactIndex] != null)
+                    {                                                                                                         //  if there is currently an impact in this spot, destroy it
+                        Destroy(impacts[impactIndex]);
+                    }
+                    // adding the (rayHit.normal/100) makes it so that the impact will show up over top of the object                                                                    
+                    // check for impact material type
+                    GameObject spawnImpact;
+
+                    switch (rayHit.transform.gameObject.tag)
+                    {
+                        case "Enemy":
+                            spawnImpact = bulletImpactEnemy;
+                            break;
+                        case "Wood":
+                            spawnImpact = bulletImpactWood;
+                            break;
+                        case "Concrete":
+                            spawnImpact = bulletImpactConcrete;
+                            break;
+                        case "Dirt":
+                            spawnImpact = bulletImpactDirt;
+                            break;
+                        case "Metal":
+                            spawnImpact = bulletImpactMetal;
+                            break;
+                        case "Glass":
+                            spawnImpact = bulletImpactGlass;
+                            break;
+                        default:
+                            spawnImpact = bulletImpactGeneric;
+                            break;
+                    }
+
+                    if (spawnImpact == null)
+                        spawnImpact = bulletImpactGeneric;
+                    Quaternion bulletRotation = Quaternion.FromToRotation(Vector3.up, rayHit.normal);
+                    Vector3 bulletPosition = rayHit.point + (rayHit.normal / 100);
+
+                    impacts[impactIndex] = Instantiate(spawnImpact, bulletPosition, bulletRotation) as GameObject;
+                    impacts[impactIndex].transform.parent = rayHit.transform;                                                                                              // parents the impact decal under the object that it has hit
+
+
+                    // handle action events after creating impact
+                    if (rayHit.transform.gameObject.tag == "Enemy")
+                    {
+                        if (rayHit.transform.gameObject.GetComponent<HealthManager>() != null)
+                            rayHit.transform.gameObject.GetComponent<HealthManager>().TakeDamage(weaponManager.CurrentWeapon.GetComponent<WeaponBehaviour>().WeaponDamage);
+                        else
+                            Debug.Log("Game Object: " + rayHit.transform.gameObject + " is tagged enemy, but does not have a HealthManager Script");
+                    }
                 }
                 
             }

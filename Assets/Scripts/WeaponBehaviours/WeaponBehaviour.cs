@@ -35,5 +35,5 @@ public abstract class WeaponBehaviour : MonoBehaviour {
     }
 
 
-    public abstract void TriggerAttack();
+    public abstract bool TriggerAttack();
 }
