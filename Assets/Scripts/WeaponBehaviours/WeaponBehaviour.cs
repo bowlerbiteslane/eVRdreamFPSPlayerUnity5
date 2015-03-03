@@ -3,7 +3,9 @@ using System.Collections;
 
 public abstract class WeaponBehaviour : MonoBehaviour {
 
-	[SerializeField]
+    [SerializeField]
+    protected int weaponIndex = 0;
+    [SerializeField]
     protected float fireRate = 0.5f;
     [SerializeField]
     protected float weaponReach = 2000f;
@@ -11,6 +13,9 @@ public abstract class WeaponBehaviour : MonoBehaviour {
     protected float weaponDamage = 25f;
     [SerializeField]
     protected float weaponAccuracy = 1f;
+
+  
+
 
     public float FireRate
     {
@@ -24,6 +29,14 @@ public abstract class WeaponBehaviour : MonoBehaviour {
     public float WeaponDamage
     {
         get { return weaponDamage; }
+    }
+
+    /// <summary>
+    /// Used to determine which 'inventory' location this item is stored in.
+    /// </summary>
+    public int WeaponIndex
+    {
+        get { return weaponIndex; }
     }
 
     /// <summary>

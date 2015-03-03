@@ -4,7 +4,7 @@ using System.Collections;
 public class PlayerShooting : MonoBehaviour {
     Camera playerCamera;
 
-    private WeaponManager weaponManager = null;
+    public WeaponManager weaponManager = null;
 
     public float shotOffsetModifer = 0.05f;
 
@@ -26,12 +26,12 @@ public class PlayerShooting : MonoBehaviour {
     private GameObject[] impacts;
     private int impactIndex = 0;
 
-    void Start()
+
+    void Awake()
     {
         rayLayerMask = ~rayLayerMask;                       // invert layer mask, otherwise the ray would only hit the player
         playerCamera = Camera.main;
         impacts = new GameObject[impactCount];
-        weaponManager = GameObject.Find("Main Camera/Weapon Manager").GetComponent<WeaponManager>();
         if (bulletImpactGeneric == null)
         {
             Debug.Log("PlayerShooting script does not have a valid generic bulletImpact texture attached. Disabling script.");
@@ -46,17 +46,18 @@ public class PlayerShooting : MonoBehaviour {
 
     }
 	// Update is called once per frame
-	void FixedUpdate () 
+	void Update () 
     {
        
         if(SCRIPTDEBUG)
             ScriptDebug();
+        nextFire += Time.deltaTime;
+        WeaponBehaviour wb = weaponManager.CurrentWeaponBehaviour;
         // on player fire
-        if (Input.GetButton("Fire1") && Time.time > nextFire)                                                                                                   // check if the player pulls the trigger and the gun is within it's firing rate
-        {   
-            // reset nextFire to gun's current fire rate
-            nextFire = Time.time + weaponManager.CurrentWeaponBehaviour.FireRate;
-            if (weaponManager.CurrentWeaponBehaviour.TriggerAttack()) { 
+        if (wb != null && Input.GetButton("Fire1") && nextFire >= wb.FireRate)                                                                                                   // check if the player pulls the trigger and the gun is within it's firing rate
+        {
+            if (weaponManager.CurrentWeaponBehaviour.TriggerAttack()) // returns true if the player is not reloading or not out of ammo
+            { 
 
                 //calculate shot inaccuracy
                 float currentWeaponAccuracy = weaponManager.CurrentWeaponBehaviour.WeaponAccuracy;
@@ -65,7 +66,7 @@ public class PlayerShooting : MonoBehaviour {
                 //shotOffsetX = .1f;
                 //shotOffsetY = .1f;
                 Vector3 shotOffset = new Vector3(shotOffsetX, shotOffsetY, 0f);
-            
+
 
                 // send raycast
                 RaycastHit rayHit;
@@ -128,11 +129,11 @@ public class PlayerShooting : MonoBehaviour {
                             Debug.Log("Game Object: " + rayHit.transform.gameObject + " is tagged enemy, but does not have a HealthManager Script");
                     }
                 }
-                
             }
-        }
-	}
 
+            nextFire = 0f;
+        }
+    }
 
     void ScriptDebug()
     {
