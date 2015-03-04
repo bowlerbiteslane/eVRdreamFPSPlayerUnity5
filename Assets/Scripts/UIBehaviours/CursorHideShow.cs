@@ -9,14 +9,14 @@ public class CursorHideShow : MonoBehaviour {
 	void Start () {
         isLocked = true;
         Screen.lockCursor = true;
-        Screen.showCursor = false;
+        Cursor.visible = false;
 	}
 
     void SetCursorLock(bool locked)
     {
         this.isLocked = locked;
         Screen.lockCursor = locked;
-        Screen.showCursor = !locked;
+        Cursor.visible = !locked;
     }
 	
 	// Update is called once per frame

@@ -24,10 +24,10 @@ public class GunBehaviour : WeaponBehaviour
     private AudioClip fireClip = null;
     private bool pointLightOn = false;
     private bool reloading = false;
-    private float timeCnt;
+    private float lightTimeCnt;
     private float rldTimeCnt;
 
-    private GameObject pointLight;
+    private Light pointLight;
 
     private string debugString;
 
@@ -63,9 +63,9 @@ public class GunBehaviour : WeaponBehaviour
     {
         ammoInCurrentClip = (int)Mathf.Clamp((float)ammoInCurrentClip, 0f, (float)clipSize);
         currentSpareClips = (int)Mathf.Clamp((float)currentSpareClips, 0f, (float)maxSpareClips);
-        timeCnt = 0f;
+        lightTimeCnt = 0f;
         rldTimeCnt = 0f;
-        pointLight = GameObject.Find("BarrelEnd/Point light");
+        pointLight = GetComponentInChildren<Light>();
         gunshotAudio = gameObject.GetComponent<AudioSource>();
         fireClip = gunshotAudio.clip;
         if (pointLight == null)
@@ -84,13 +84,13 @@ public class GunBehaviour : WeaponBehaviour
     // Update is called once per frame
     void Update()
     {
-        timeCnt += Time.deltaTime;
-        if (pointLightOn && timeCnt > gunFlashLength)
+        lightTimeCnt += Time.deltaTime;
+        if (pointLightOn && lightTimeCnt > gunFlashLength)
         {
             //disable point light
-            pointLightOn = false;
-            pointLight.light.enabled = false;
-            timeCnt = 0f;
+            pointLight.enabled = false;
+			pointLightOn = false;
+            lightTimeCnt = 0f;
         }
         rldTimeCnt += Time.deltaTime;
         if (reloading && rldTimeCnt > reloadTime)
@@ -114,8 +114,8 @@ public class GunBehaviour : WeaponBehaviour
             debugString = "[Ammo In Clip: " + ammoInCurrentClip + "] [Spare Clips: " + currentSpareClips + "] [Total Ammo: " + (ammoInCurrentClip + (clipSize * currentSpareClips)+"]");
             // other gun effects
             pointLightOn = true;
-            pointLight.light.enabled = true;
-            timeCnt = 0f;
+            pointLight.enabled = true;
+            lightTimeCnt = 0f;
             gunshotAudio.Play();
             return true;
         }
@@ -168,7 +168,7 @@ public class GunBehaviour : WeaponBehaviour
         }
         else
         {
-            Debug.Log("Already at max clip capacity.");
+            debugString = "Already at max clip capacity.";
         }
     }
 
